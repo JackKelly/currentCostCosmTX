@@ -1,0 +1,10 @@
+Very simple Python script for sending power data from a Current Cost to Pachube roughly once every six seconds. 
+
+To use, you need to create a config.xml file in the following format:
+
+<config>
+  <apikey>YOUR PACHUBE API KEY</apikey>
+  <feed>YOUR PACHUBE FEED ID</feed>
+  <datastream>YOUR PACHUBE DATASTREAM</datastream>
+  <serialport>THE SERIAL PORT TO WHICH YOUR CURRENT COST IS ATTACHED e.g. /dev/ttyUSB0</serialport>
+</config>
