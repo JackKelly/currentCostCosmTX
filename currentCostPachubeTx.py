@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET # for XML parsing
 import urllib2 # for sending data to Pachube
 import json # for assembling JSON data for Pachube
 import time # for printing UNIX timecode
-
+import sys # for handling errors
 
 #########################################
 #            CONSTANTS                  #
@@ -22,6 +22,8 @@ DATASTREAM  = configTree.findtext("datastream") # Your Pachube datastream
 #########################################
 
 ser = serial.Serial(SERIAL_PORT, 57600)
+ser.flushInput()
+
 def pullFromCurrentCost():
     ''' read line of XML from the CurrentCost meter. '''
     # For Current Cost XML details, see currentcost.com/cc128/xml.htm
@@ -30,6 +32,7 @@ def pullFromCurrentCost():
         line = ser.readline()
         tree  = ET.XML( line )
         watts = tree.findtext("ch1/watts")
+    ser.flushInput()
     return watts
 
 
@@ -57,7 +60,12 @@ def pushToPachube( reading ):
     request = urllib2.Request('http://api.pachube.com/v2/feeds/'+FEED, data=jsonData)
     request.add_header('X-PachubeApiKey', API_KEY)
     request.get_method = lambda: 'PUT'
-    opener.open(request)
+    try:
+        opener.open(request)
+    except urllib2.URLError as reason:
+        sys.stderr.write("URL IO error: " + str(reason) + "\n")
+    except urllib2.HTTPError as reason:
+        sys.stderr.write("HTTP error: " + str(reason) + "\n")
 
 
 #########################################
@@ -70,3 +78,4 @@ while True:
     data = pullFromCurrentCost()
     print int(time.time()), "\t", data
     pushToPachube( data )
+    sys.stdout.flush()
