@@ -21,17 +21,21 @@ DATASTREAM  = configTree.findtext("datastream") # Your Pachube datastream
 #          PULL FROM CURRENT COST       #
 #########################################
 
-ser = serial.Serial(SERIAL_PORT, 57600)
-ser.flushInput()
-
 def pullFromCurrentCost():
-    ''' read line of XML from the CurrentCost meter. '''
+    ''' read line of XML from the CurrentCost meter and return instantaneous power consumption. '''
     # For Current Cost XML details, see currentcost.com/cc128/xml.htm
+    
+    # Read XML from Current Cost.  Try again if nothing is returned.
     watts = None
     while watts == None:
         line = ser.readline()
-        tree  = ET.XML( line )
+        try:
+            tree  = ET.XML( line )
+        except Exception, inst: # Catch XML errors (occasionally the current cost outputs malformed XML)
+            sys.stderr.write("XML error: " + str(inst))
+            
         watts = tree.findtext("ch1/watts")
+        
     ser.flushInput()
     return watts
 
@@ -75,6 +79,11 @@ def pushToPachube( reading ):
 
 print "UNIX time \t watts"
 
+# initialise serial port
+ser = serial.Serial(SERIAL_PORT, 57600)
+ser.flushInput() # get rid of 
+
+# continually pull data from current cost, print to stout and send to pachube
 while True:
     data = pullFromCurrentCost()
     print int(time.time()), "\t", data
