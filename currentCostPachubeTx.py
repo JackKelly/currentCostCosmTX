@@ -49,9 +49,10 @@ def pushToPachube( reading ):
                            "datastreams":[{
                                            "id"           : DATASTREAM,
                                            "current_value": reading,
+                                           "min_value"    : 0.0,
                                            "unit": {
-                                                    "type"  : "conversionBasedUnits",
-                                                    "label" : "watts",
+                                                    "type"  : "derivedSI",
+                                                    "label" : "watt",
                                                     "symbol": "W"}
                                            }
                                           ] 
