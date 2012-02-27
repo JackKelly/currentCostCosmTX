@@ -31,10 +31,10 @@ def pullFromCurrentCost():
         line = ser.readline()
         try:
             tree  = ET.XML( line )
+            watts = tree.findtext("ch1/watts")
         except Exception, inst: # Catch XML errors (occasionally the current cost outputs malformed XML)
             sys.stderr.write("XML error: " + str(inst))
-            
-        watts = tree.findtext("ch1/watts")
+            line = None
         
     ser.flushInput()
     return watts
