@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/python
 import serial # for pulling data from Current Cost
 import xml.etree.ElementTree as ET # for XML parsing
 import urllib2 # for sending data to Pachube
