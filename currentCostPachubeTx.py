@@ -67,11 +67,15 @@ def pushToPachube( reading ):
     request.get_method = lambda: 'PUT'
     try:
         opener.open(request)
-    except urllib2.URLError as reason:
-        sys.stderr.write("URL IO error: " + str(reason) + "\n")
-    except urllib2.HTTPError as reason:
-        sys.stderr.write("HTTP error: " + str(reason) + "\n")
-
+#    except urllib2.URLError as reason:
+#        sys.stderr.write("URL IO error: " + str(reason) + "\n")
+#    except urllib2.HTTPError as reason:
+#        sys.stderr.write("HTTP error: " + str(reason) + "\n")
+#    except httplib.HTTPException as reason:
+#        sys.stderr.write("httplib.HTTPException: " + str(reason) + "\n")
+    except Exception:
+        import traceback
+        sys.stderr.write('Generic error: ' + traceback.format_exc())
 
 #########################################
 #          MAIN                         #
