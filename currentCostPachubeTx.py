@@ -87,6 +87,6 @@ ser.flushInput() # get rid of
 while True:
     data = pullFromCurrentCost()
     print int(time.time()), "\t", data['sensor'], "\t", data['watts']
-    if data['sensor'] == 0:
+    if data['sensor'] == '0' :
         pushToPachube( data['watts'] )
     sys.stdout.flush()
