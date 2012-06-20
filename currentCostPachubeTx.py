@@ -26,21 +26,20 @@ def pullFromCurrentCost():
     # For Current Cost XML details, see currentcost.com/cc128/xml.htm
     
     # Read XML from Current Cost.  Try again if nothing is returned.
-    watts = [None, None, None, None]
-    while watts == [None, None, None, None]:
+    watts  = None
+    sensor = None
+    while watts == None:
         line = ser.readline()
         try:
             tree  = ET.XML( line )
-            watts[0] = tree.findtext("ch1/watts")
-            watts[1] = tree.findtext("ch2/watts")
-            watts[2] = tree.findtext("ch3/watts")
-            watts[3] = tree.findtext("ch4/watts")
+            watts  = tree.findtext("ch1/watts")
+            sensor = tree.findtext("sensor")
         except Exception, inst: # Catch XML errors (occasionally the current cost outputs malformed XML)
             sys.stderr.write("XML error: " + str(inst))
             line = None
         
     ser.flushInput()
-    return watts
+    return {'sensor': sensor, 'watts': watts}
 
 
 #########################################
@@ -78,7 +77,7 @@ def pushToPachube( reading ):
 #          MAIN                         #
 #########################################
 
-print "UNIX time \t watts"
+print "UNIX time \t sensor \t watts"
 
 # initialise serial port
 ser = serial.Serial(SERIAL_PORT, 57600)
@@ -87,6 +86,7 @@ ser.flushInput() # get rid of
 # continually pull data from current cost, print to stout and send to pachube
 while True:
     data = pullFromCurrentCost()
-    print int(time.time()), "\t", data
-    pushToPachube( data[0] )
+    print int(time.time()), "\t", data['sensor'], "\t", data['watts']
+    if data['sensor'] == 0:
+        pushToPachube( data['watts'] )
     sys.stdout.flush()
