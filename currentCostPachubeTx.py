@@ -26,12 +26,15 @@ def pullFromCurrentCost():
     # For Current Cost XML details, see currentcost.com/cc128/xml.htm
     
     # Read XML from Current Cost.  Try again if nothing is returned.
-    watts = None
-    while watts == None:
+    watts = [None, None, None, None]
+    while watts == [None, None, None, None]:
         line = ser.readline()
         try:
             tree  = ET.XML( line )
-            watts = tree.findtext("ch1/watts")
+            watts[0] = tree.findtext("ch1/watts")
+            watts[1] = tree.findtext("ch2/watts")
+            watts[2] = tree.findtext("ch3/watts")
+            watts[3] = tree.findtext("ch4/watts")
         except Exception, inst: # Catch XML errors (occasionally the current cost outputs malformed XML)
             sys.stderr.write("XML error: " + str(inst))
             line = None
@@ -67,12 +70,6 @@ def pushToPachube( reading ):
     request.get_method = lambda: 'PUT'
     try:
         opener.open(request)
-#    except urllib2.URLError as reason:
-#        sys.stderr.write("URL IO error: " + str(reason) + "\n")
-#    except urllib2.HTTPError as reason:
-#        sys.stderr.write("HTTP error: " + str(reason) + "\n")
-#    except httplib.HTTPException as reason:
-#        sys.stderr.write("httplib.HTTPException: " + str(reason) + "\n")
     except Exception:
         import traceback
         sys.stderr.write('Generic error: ' + traceback.format_exc())
@@ -91,5 +88,5 @@ ser.flushInput() # get rid of
 while True:
     data = pullFromCurrentCost()
     print int(time.time()), "\t", data
-    pushToPachube( data )
+    pushToPachube( data[0] )
     sys.stdout.flush()
