@@ -15,7 +15,6 @@ configTree  = ET.parse("config.xml") # load config from config file
 SERIAL_PORT = configTree.findtext("serialport") # the serial port to which your Current Cost is attached
 API_KEY     = configTree.findtext("apikey") # Your Pachube API Key
 FEED        = configTree.findtext("feed")   # Your Pachube Feed number
-DATASTREAM  = configTree.findtext("datastream") # Your Pachube datastream
 
 
 #########################################
@@ -47,7 +46,7 @@ def pullFromCurrentCost():
 #          MAIN                         #
 #########################################
 
-print "time\tsensor\twatts"
+print "UNIXtime\tsensor\twatts"
 
 # initialise serial port
 ser = serial.Serial(SERIAL_PORT, 57600)
@@ -62,7 +61,7 @@ dataStreamDefaults = {
             }
     }
 
-c=CosmSender(API_KEY, FEED, dataStreamDefaults, cacheSize=3)
+c = CosmSender(API_KEY, FEED, dataStreamDefaults, cacheSize=3)
 
 # continually pull data from current cost, print to stout and send to Cosm
 while True:
@@ -82,5 +81,7 @@ while True:
     sys.stdout.flush()
 
 # TODO
-# * Use a file to store mapping between sensor numbers and names
-# * automatically start a new data output file when script starts, using the correct numbering
+# * Use a file to store mapping between sensor numbers and names (perhaps using pickle module)
+# * automatically start a new data output file when script starts, using the correct numbering,
+#   save files to a directory specified in config.xml (and add this to .gitignore and then
+#   use git to upload my data automatically to github)
