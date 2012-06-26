@@ -1,10 +1,11 @@
 #! /usr/bin/python
 import serial # for pulling data from Current Cost
 import xml.etree.ElementTree as ET # for XML parsing
+import time # for printing UNIX timecode
 import urllib2 # for sending data to Pachube
 import json # for assembling JSON data for Pachube
-import time # for printing UNIX timecode
-import sys # for handling errors
+import sys # for printing errors to stderr
+from cosmSender import CosmSender
 
 #########################################
 #            CONSTANTS                  #
@@ -39,54 +40,47 @@ def pullFromCurrentCost():
             line = None
         
     ser.flushInput()
-    return {'sensor': sensor, 'watts': watts}
+    return sensor, watts
 
-
-#########################################
-#        PUSH TO PACHUBE                #
-#########################################
-
-def pushToPachube( reading ):
-    '''For sending a single reading to Pachube'''
-    # adapted from http://stackoverflow.com/a/111988
-    reading = int(reading)
-    jsonData = json.dumps({
-                           "version":"1.0.0",
-                           "datastreams":[{
-                                           "id"           : DATASTREAM,
-                                           "current_value": reading,
-                                           "min_value"    : 0.0,
-                                           "unit": {
-                                                    "type"  : "derivedSI",
-                                                    "label" : "watt",
-                                                    "symbol": "W"}
-                                           }
-                                          ] 
-                           })
-    opener = urllib2.build_opener(urllib2.HTTPHandler)
-    request = urllib2.Request('http://api.pachube.com/v2/feeds/'+FEED, data=jsonData)
-    request.add_header('X-PachubeApiKey', API_KEY)
-    request.get_method = lambda: 'PUT'
-    try:
-        opener.open(request)
-    except Exception:
-        import traceback
-        sys.stderr.write('Generic error: ' + traceback.format_exc())
 
 #########################################
 #          MAIN                         #
 #########################################
 
-print "UNIX time \t sensor \t watts"
+print "time\tsensor\twatts"
 
 # initialise serial port
 ser = serial.Serial(SERIAL_PORT, 57600)
-ser.flushInput() # get rid of 
+ser.flushInput()
 
-# continually pull data from current cost, print to stout and send to pachube
+# Setup CosmSender
+dataStreamDefaults = {
+    "min_value"    : "0.0",
+    "unit": { "type"  : "derivedSI",
+              "label" : "watt",
+              "symbol": "W"
+            }
+    }
+
+c=CosmSender(API_KEY, FEED, dataStreamDefaults, cacheSize=3)
+
+# continually pull data from current cost, print to stout and send to Cosm
 while True:
-    data = pullFromCurrentCost()
-    print int(time.time()), "\t", data['sensor'], "\t", data['watts']
-    if data['sensor'] == '0' :
-        pushToPachube( data['watts'] )
+    # Get data from Current Cost Envi
+    sensor, watts = pullFromCurrentCost()
+
+    # Print data to the standard output
+    print int(time.time()), "\t", sensor, "\t", watts
+
+    # Send data to Cosm
+    try:
+        c.sendData(sensor, watts)
+    except:
+        import traceback
+        sys.stderr.write('Generic error: ' + traceback.format_exc())
+
     sys.stdout.flush()
+
+# TODO
+# * Use a file to store mapping between sensor numbers and names
+# * automatically start a new data output file when script starts, using the correct numbering

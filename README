@@ -1,4 +1,8 @@
-Very simple Python script for sending power data from a Current Cost to Pachube roughly once every six seconds. 
+Very simple Python script for sending power data from a Current Cost
+to Cosm (Pachube).
+
+This requires my cosmSender.py module available from:
+https://github.com/JackKelly/cosmSender
 
 To use, you need to create a config.xml file in the following format:
 
