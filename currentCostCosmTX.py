@@ -16,7 +16,7 @@ configTree  = ET.parse("config.xml") # load config from config file
 SERIAL_PORT = configTree.findtext("serialport") # the serial port to which your Current Cost is attached
 API_KEY     = configTree.findtext("apikey") # Your Cosm API Key
 FEED        = configTree.findtext("feed")   # Your Cosm Feed number
-FILENAME    = configTree.findtext("filename") # Directory to save data to
+FILENAME    = configTree.findtext("filename") # File to save data to
 
 #########################################
 #     SENSOR NAMES                      #
@@ -73,7 +73,7 @@ dataStreamDefaults = {
 
 c = CosmSender(API_KEY, FEED, dataStreamDefaults, cacheSize=3)
 
-# continually pull data from current cost, print to stout and send to Cosm
+# continually pull data from current cost, write to file, print to stout and send to Cosm
 while True:
     # Get data from Current Cost Envi
     sensor, watts = pullFromCurrentCost()
@@ -90,6 +90,7 @@ Has it been configured correctly in config.xml?""")
     UNIXtime = str ( int( round(time.time()) ) )
     string   = UNIXtime + "\t" + sensor + "\t" + watts + "\n"
     datafile.write( string )
+    datafile.close()
     print string,
 
     # Send data to Cosm
