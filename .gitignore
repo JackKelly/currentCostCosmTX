@@ -31,3 +31,4 @@ _$*
 .pydevproject
 config.xml
 sensorNames.csv
+*.txt

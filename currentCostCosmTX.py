@@ -6,6 +6,7 @@ import urllib2 # for sending data to Pachube
 import json # for assembling JSON data for Pachube
 import sys # for printing errors to stderr
 from cosmSender import CosmSender
+import os # to find names of existing files
 
 #########################################
 #            CONSTANTS                  #
@@ -13,9 +14,20 @@ from cosmSender import CosmSender
 
 configTree  = ET.parse("config.xml") # load config from config file
 SERIAL_PORT = configTree.findtext("serialport") # the serial port to which your Current Cost is attached
-API_KEY     = configTree.findtext("apikey") # Your Pachube API Key
-FEED        = configTree.findtext("feed")   # Your Pachube Feed number
+API_KEY     = configTree.findtext("apikey") # Your Cosm API Key
+FEED        = configTree.findtext("feed")   # Your Cosm Feed number
+FILENAME    = configTree.findtext("filename") # Directory to save data to
 
+#########################################
+#     SENSOR NAMES                      #
+#########################################
+try:
+    f = open('sensorNames.csv')
+    lines = f.readlines()
+    sensorNames = [ line.strip() for line in lines ]
+except:
+    sys.stderr.write('WARNING: sensorNames.csv not found.  Will just use sensor numbers instead.\n')
+    sensorNames = None
 
 #########################################
 #          PULL FROM CURRENT COST       #
@@ -46,8 +58,6 @@ def pullFromCurrentCost():
 #          MAIN                         #
 #########################################
 
-print "UNIXtime\tsensor\twatts"
-
 # initialise serial port
 ser = serial.Serial(SERIAL_PORT, 57600)
 ser.flushInput()
@@ -68,20 +78,30 @@ while True:
     # Get data from Current Cost Envi
     sensor, watts = pullFromCurrentCost()
 
-    # Print data to the standard output
-    print int(time.time()), "\t", sensor, "\t", watts
+    # open data file
+    try:
+        datafile = open(FILENAME, 'a+')
+    except Exception, e:
+        sys.stderr.write("""ERROR: Failed to open data file " + FILENAME +
+Has it been configured correctly in config.xml?""")
+        raise
+
+    # Print data to the file
+    UNIXtime = str ( int( round(time.time()) ) )
+    string   = UNIXtime + "\t" + sensor + "\t" + watts + "\n"
+    datafile.write( string )
+    print string,
 
     # Send data to Cosm
+    if sensorNames == None:
+        sensorName = sensor
+    else:
+        sensorName = sensor + '_' + sensorNames[int(sensor)]
+
     try:
-        c.sendData(sensor, watts)
+        c.sendData(sensorName, watts)
     except:
         import traceback
         sys.stderr.write('Generic error: ' + traceback.format_exc())
 
     sys.stdout.flush()
-
-# TODO
-# * Use a file to store mapping between sensor numbers and names (perhaps using pickle module)
-# * automatically start a new data output file when script starts, using the correct numbering,
-#   save files to a directory specified in config.xml (and add this to .gitignore and then
-#   use git to upload my data automatically to github)
