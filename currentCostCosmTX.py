@@ -71,7 +71,7 @@ dataStreamDefaults = {
             }
     }
 
-c = CosmSender(API_KEY, FEED, dataStreamDefaults, cacheSize=3)
+c = CosmSender(API_KEY, FEED, dataStreamDefaults, cacheSize=10)
 
 # continually pull data from current cost, write to file, print to stout and send to Cosm
 while True:
