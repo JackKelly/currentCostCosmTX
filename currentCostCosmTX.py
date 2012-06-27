@@ -106,3 +106,5 @@ Has it been configured correctly in config.xml?""")
         sys.stderr.write('Generic error: ' + traceback.format_exc())
 
     sys.stdout.flush()
+
+c.flush()
