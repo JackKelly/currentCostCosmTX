@@ -32,3 +32,4 @@ _$*
 config.xml
 sensorNames.csv
 *.txt
+nohup.out
