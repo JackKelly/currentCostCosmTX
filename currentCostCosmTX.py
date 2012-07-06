@@ -94,7 +94,7 @@ Has it been configured correctly in config.xml?""")
     print string,
 
     # Send data to Cosm
-    if sensorNames == None:
+    if sensorNames == None or len(sensorNames) <= int(sensor):
         sensorName = sensor
     else:
         sensorName = sensor + '_' + sensorNames[int(sensor)]
