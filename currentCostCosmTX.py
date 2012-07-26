@@ -47,7 +47,7 @@ def pullFromCurrentCost():
             watts  = tree.findtext("ch1/watts")
             sensor = tree.findtext("sensor")
         except Exception, inst: # Catch XML errors (occasionally the current cost outputs malformed XML)
-            sys.stderr.write("XML error: " + str(inst))
+            sys.stderr.write("XML error: " + str(inst) + "\n")
             line = None
         
     ser.flushInput()
