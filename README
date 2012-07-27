@@ -1,4 +1,4 @@
-Very Python script for sending power data from a Current Cost
+Python script for sending power data from a Current Cost
 to Cosm (Pachube) and also to log data to a local file.  Can handle
 multiple sensors (e.g. multiple Individual Appliance Monitors).
 
