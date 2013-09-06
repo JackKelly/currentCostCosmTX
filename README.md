@@ -7,7 +7,7 @@ https://github.com/JackKelly/cosmSender
 
 To use, you need to create a config.xml file in the following format:
 
-```XLM
+```XML
 <config>
   <apikey>YOUR PACHUBE API KEY</apikey>
   <feed>YOUR PACHUBE FEED ID</feed>
@@ -18,7 +18,7 @@ To use, you need to create a config.xml file in the following format:
 </config>
 ```
 
-## FINDING THE CORRECT SERIAL PORT
+## Finding the correct serial port
 
 Run a command like "dmesg | grep USB" and then look for a line
 which reads something like 
@@ -36,7 +36,7 @@ cable, the answer is that the USB cable has a little serial
 port converter in it.
 
 
-## MULTIPLE SENSORS
+## Multiple sensors
 
 Optionally, if you have multiple sensors connected to your CurrentCost
 (for example if you're using Individual Appliance Monitors) then you
@@ -50,7 +50,7 @@ fridge
 laptop
 
 
-## MULTIPLE INSTANCES OF currentCostCosmTX
+## Multiple instances of currentCostCosmTX
 
 If updating one xively / cosm feed from two different programs or
 devices you need to use different api keys or will get a 403 error.
